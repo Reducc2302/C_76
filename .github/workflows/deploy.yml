@@ -1,6 +1,6 @@
-# MSRB GA VERSION: V1.3
+# VERSION: V1.4
 
-name: MSRB
+name: Deploy Original
 
 on:
 
@@ -31,7 +31,7 @@ env:
   ACCOUNTS: ${{ secrets.ACCOUNTS }}
   RETRY_THE_BOT: True
   DELETE_OLD_WORKFLOWS: True
-  DELETE_OLD_WORKFLOWS_SECOND: 604800
+  DELETE_OLD_WORKFLOWS_SECOND: 86400
   PRINT_OUT_THE_LOG_AFTER_RUNNING_BOT: True
   COMMIT_LOG_ACCOUNTS_JSON_AFTER_RUNNING_BOT: True
   COMMIT_ALL_REPO_AFTER_RUNNING_BOT: False
@@ -45,14 +45,12 @@ jobs:
     timeout-minutes: 30 # Limit the time of the bot
 
     steps:
-    
-    
+
     - name: Check Public IP
       uses: haythem/public-ip@master
-    
-    - name: checkout
-      uses: actions/checkout@master
 
+    - name: checkout
+      uses: actions/checkout@main
 
 # SET REPO STUFF
 
@@ -71,10 +69,12 @@ jobs:
         mv * ../
         cd ${{ github.WORKSPACE }}
         rm -rf Microsoft-Rewards-bot
+
     - name: Create / Recreate accounts.json
       if: ${{ env.ACCOUNTS }}
       run: |
         wget -O accounts.json ${{ env.ACCOUNTS }} > /dev/null 2>&1
+
     - name: Set the COMMAND & RETRY_COMMAND
       id: set_commands
       run: |
@@ -88,6 +88,7 @@ jobs:
         then
           echo "RETRY_COMMAND=${{ env.DEFAULT_COMMAND }}" >> $GITHUB_ENV
         fi
+
     - name: Check Variables before run
       run: |
         # Check if the COMMAND has --session or not to decide to use github action cache
@@ -98,6 +99,7 @@ jobs:
         # Add --on-finish exit into COMMAND & RETRY_COMMAND
         echo "COMMAND=${{ env.COMMAND }} --on-finish exit" >> $GITHUB_ENV
         echo "RETRY_COMMAND=${{ env.RETRY_COMMAND }} --on-finish exit" >> $GITHUB_ENV
+
 # USE GITHUB CACHE IF COMMAND HAS --SESSION
 # IF YOU FACE ANY ERROR, TRY TO DELETE OLD GITHUB ACTION CACHE
 
@@ -133,6 +135,7 @@ jobs:
       if: ${{ failure() && env.RETRY_THE_BOT == 'True' }}
       run: |
         ${{ env.RETRY_COMMAND }}
+
 # CHECK LOG_ACCOUNTS.TXT
 
     - name: Print out the log after run
@@ -160,6 +163,7 @@ jobs:
           git add Logs_accounts.txt
           git commit -m "Upload Logs_accounts.txt"
           git push -f
+
 # DELETE WORKFLOWS WHICH ARE OLDER THAN ... SEC
 
   Delete_old_workflows:
