@@ -4,5 +4,5 @@
         "Today's points": 481,
         "Points": 1321
     },
-    "Elapsed time": "00:12:53"
+    "Elapsed time": "00:00:00"
 }
